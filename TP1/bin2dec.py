@@ -5,6 +5,8 @@ b = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0])
 c = np.array([1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 d = np.array([0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1])
 
+##Info util: https://oletus.github.io/float16-simulator.js/
+##           https://observablehq.com/@rreusser/half-precision-floating-point-visualized
 
 #Todavia tiene el error, TODO revisar error
 def bin2dec(bin_num):
@@ -44,7 +46,7 @@ def bin2dec(bin_num):
 
 
 
-
+bin2dec(d)
 
 
 
