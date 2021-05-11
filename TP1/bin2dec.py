@@ -1,58 +1,72 @@
+"""
+Created on Sat Mar 20 15:25:34 2021
+@author: grupo 7
+"""
+
 import numpy as np
 
-a = np.array([0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0])
-b = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0])
-c = np.array([1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-d = np.array([0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1])
 
-##Info util: https://oletus.github.io/float16-simulator.js/
-##           https://observablehq.com/@rreusser/half-precision-floating-point-visualized
+def binf2dec(binf):
+    numBin = np.array(binf)
+    s = numBin[0]           #Obtenemos el signo del numero
+    e = numBin[1:6]         #Obtenemos el exponente del numero
+    m = numBin[6:16]        #Obtenemos la mantiza del numero
+    
+    exp = np.sum(e)         #Obtengo la cantidad de 1's del exponente
+    man = np.sum(m)         #Obtengo la cantidad de 1's de la mantiza
+    
+    exp_all_ones = 5        #Si el exp son todos 1's tendriamos 5x1
+    man_all_ones = 10       #Si el man son todos 1's tendriamos 10x1
 
-#Todavia tiene el error, TODO revisar error
-def bin2dec(bin_num):
-    sign_dec = (-1)**bin_num[0]
-    significand_dec = 0
+    if((exp == 0) and (man == 0)):
+        print("El numero ingresado es nulo")
+        return 0
+    elif((exp == exp_all_ones) and (man == 0)):
+        if(s == 1):
+            print("El numero ingresado es +inf")
+            return np.Inf
+        else:
+            print("El numero ingresado es -inf")
+            return np.NINF
+    elif((exp == exp_all_ones) and (man != 0)):
+        print("El numero ingresado no es un numero")
+        return np.NAN
+    elif((exp == 0) and (man != 0)):
+        print("El numero ingresado es subnormal ")
+        sesgo = 2**(exp_all_ones - 1) - 1
+        mantiza = 0
+        for i in np.arange(man_all_ones):
+            mantiza = mantiza + m[i]*(2.0**-(i+1))
+        val = ((-1)**s)*mantiza*(2.0**(1-sesgo))
+        print("Su valor es:")
+        print("{:.10f}".format(val))
+        return val
+    elif((exp > 0) and (exp < exp_all_ones)):
+        print("El numero ingresado es normal ")
+        sesgo = 2**(exp_all_ones - 1) - 1
+        mantiza = 0
+        exponte = 0
+        for i in np.arange(exp_all_ones):
+            exponte = exponte + e[i]*(2**(exp_all_ones - i - 1))
+        for i in np.arange(man_all_ones):
+            mantiza = mantiza + m[i]*(2.0**-(i+1))
+        mantiza = mantiza + 1
+        val = ((-1)**s)*mantiza*(2.0**(exponte-sesgo))
+        print("Su valor es:")
+        print("{:.10f}".format(val))
+        return val
+    
+    
+def test():
+    a = np.array([0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0])
+    b = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0])
+    c = np.array([1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    d = np.array([0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1])
+    x = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0])
 
-    exponent_dec = 0
-    exponent_bin = np.copy(bin_num[1:6])
-
-    if not exponent_bin.any():
-        print("son todos 0s")
-        exponent_dec = 2**-14
-        #el significante es 0,...
-
-    elif exponent_bin.all():
-        print("son todos 1s")
-        #Debe retornar infinito
-
-    else:
-        significand_dec += 1
-        number = 0
-        for i in range(0, exponent_bin.size):
-            number += exponent_bin[i] * 2**(exponent_bin.size - 1 - i)
-
-        exponent_dec = 2**(number - 15)
-
-    mantissa_bin = bin_num[6:]
-
-    var = 0
-    for i in range(0, mantissa_bin.size):
-        var += mantissa_bin[i] * 2 ** (mantissa_bin.size - 1 - i)
-
-    significand_dec += (var/1024)
-
-    print(sign_dec*exponent_dec*significand_dec)
-    return sign_dec*exponent_dec*significand_dec
-
-
-
-bin2dec(d)
-
-
-
-
-
-
-
-
+    binf2dec(a)
+    binf2dec(b)
+    binf2dec(c)
+    binf2dec(d)
+    binf2dec(x)
 
